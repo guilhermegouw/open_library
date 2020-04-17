@@ -5,34 +5,38 @@ import psycopg2
 
 
 # Download from S3
-s3 = boto3.client('s3')
-s3.download_file('open-library', 'json_result.json', 'json_result.json')
+s3_client = boto3.client('s3')
+s3_client.download_file('open-library', 'json_result.json', 'json_result.json')
 
 
 # Creating table
-try:
-    conn = psycopg2.connect(user="postgres",
-                        password="postgres",
-                        host="localhost",
-                        port="5435",
-                        database="postgres",)
 
-    cursor = conn.cursor()
+conn = psycopg2.connect(user="postgres",
+                    password="postgres",
+                    host="localhost",
+                    port="5433",
+                    database="postgres",)
 
-    create_table_books = '''CREATE TABLE books
-    (ID SERIAL PRIMARY KEY,
-    TITLE TEXT NOT NULL,
-    SUBJECT TEXT [],
-    FIRSTPUBLISH TEXT NOT NULL,
-    KEY TEXT NOT NULL);'''
+cursor = conn.cursor()
+cursor.execute("select * from information_schema.tables where table_name=%s", ('books',))
+table_exists = bool(cursor.rowcount)
 
-    cursor.execute(create_table_books)
-    conn.commit()
-    print("Table created successfully in PostgreSQL")
+if table_exists is False:
+    try:
+        create_table_books = '''CREATE TABLE books
+        (ID SERIAL PRIMARY KEY,
+        TITLE TEXT NOT NULL,
+        SUBJECT TEXT [],
+        FIRSTPUBLISH TEXT NOT NULL,
+        KEY TEXT NOT NULL);'''
 
-except (Exception, psycopg2.DatabaseError) as error:
-    print("Error while creating PostgreSQL table", error)
-
+        cursor.execute(create_table_books)
+        conn.commit()
+        print("Table created successfully in PostgreSQL")
+    except(Exception, psycopg2.DatabaseError) as error:
+        print("Error while creating PostgreSQL table", error)
+else:
+    print('Table already exists.')
 
 # open the file
 with open('json_result.json', 'r') as json_file:
