@@ -24,11 +24,10 @@ table_exists = bool(cursor.rowcount)
 if table_exists is False:
     try:
         create_table_books = '''CREATE TABLE books
-        (ID SERIAL PRIMARY KEY,
+        (KEY TEXT PRIMARY KEY,
         TITLE TEXT NOT NULL,
         SUBJECT TEXT [],
-        FIRSTPUBLISH TEXT NOT NULL,
-        KEY TEXT NOT NULL);'''
+        FIRSTPUBLISH TEXT NOT NULL);'''
 
         cursor.execute(create_table_books)
         conn.commit()
@@ -46,9 +45,9 @@ book_data = data['docs']
 
 # Insert data from file to table
 try:
-    insert_books = """INSERT INTO books (TITLE, SUBJECT, FIRSTPUBLISH, KEY) VALUES (%s, %s, %s, %s)"""
+    insert_books = """INSERT INTO books (KEY, TITLE, SUBJECT, FIRSTPUBLISH) VALUES (%s, %s, %s, %s)"""
     for book in book_data:
-        record_to_insert = (book['title'], book['subject'], book['first_publish_year'], book['key'])
+        record_to_insert = (book['key'], book['title'], book['subject'], book['first_publish_year'])
         cursor.execute(insert_books, record_to_insert)
     conn.commit()
     print("Data successfully inserted into books table")
