@@ -13,10 +13,13 @@ tableName = 'books'
 
 # dropTableStmt = "DROP TABLE books;"
 
-dropTableStmt_2 = "DROP TABLE books2;"
+dropTableStmt_2 = "DROP TABLE subjects;"
+dropTableStmt = "DROP TABLE books;"
 
 
 cursor.execute(dropTableStmt_2)
+
+cursor.execute(dropTableStmt)
 
 conn.commit()
 cursor.close()
